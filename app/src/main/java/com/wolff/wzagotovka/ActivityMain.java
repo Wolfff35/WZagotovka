@@ -47,8 +47,8 @@ public class ActivityMain extends AppCompatActivity
             @Override
             public void onClick(View view) {
                 WItem item = new WItem();
-                WItemLab.get(getApplicationContext()).addWItem(item);
-                Intent intent = Activity_WItem_Pager.newIntent(getApplicationContext(),item.getId());
+                //WItemLab.get(getApplicationContext()).addWItem(item);
+                Intent intent = Activity_WItem_Pager.newIntent(getApplicationContext(),item.getId(),true);
                 startActivity(intent);
                 //Log.e("CLICK ITEM",""+item.getTitle());
                 //Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)

@@ -23,10 +23,12 @@ public class Activity_WItem_Pager extends FragmentActivity {
     private ViewPager mViewPager;
     private List<WItem> mWItems;
     public static final String EXTRA_WITEM_ID = "witem_id";
+    public static final String EXTRA_ISNEWITEM = "isNewItem";
 
-    public static Intent newIntent(Context packageContext, UUID witemId) {
+    public static Intent newIntent(Context packageContext, UUID witemId,boolean isNewItem) {
         Intent intent = new Intent(packageContext, Activity_WItem_Pager.class);
         intent.putExtra(EXTRA_WITEM_ID, witemId);
+        intent.putExtra(EXTRA_ISNEWITEM, isNewItem);
         Log.e("ACTIVITY NEW INTENT"," "+witemId);
         return intent;
     }
@@ -36,6 +38,7 @@ public class Activity_WItem_Pager extends FragmentActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_witem_pager);
         UUID wItemId = (UUID) getIntent().getSerializableExtra(EXTRA_WITEM_ID);
+        final boolean isNewItem = getIntent().getBooleanExtra(EXTRA_ISNEWITEM,false);
         Log.e("ACTIVITY ON CREATE ",""+wItemId);
         mViewPager = (ViewPager)findViewById(R.id.viewPager_container);
         mWItems = WItemLab.get(this).getWItems();
@@ -46,7 +49,7 @@ public class Activity_WItem_Pager extends FragmentActivity {
                 //
                 WItem item = mWItems.get(position);
                 //Log.e("GET ITEM = ",""+position+"; current item = "+mViewPager.getCurrentItem());
-                return Fragment_WItem.newInstance(item.getId(),getApplicationContext());
+                return Fragment_WItem.newInstance(item.getId(),getApplicationContext(),isNewItem);
             }
 
             @Override

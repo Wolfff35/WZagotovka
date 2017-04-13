@@ -38,8 +38,9 @@ public class Fragment_WItem extends Fragment {
     private Button btnAddDate;
     private ImageView imPhoto;
     private static final String ARG_WITEM_ID = "WItem_ID";
+    private static final String ARG_ISNEWITEM_ID = "isNewItem";
     private int seekDelta = 5;
-
+    private  boolean isNewItem;
     @Override
     public void onPause() {
         super.onPause();
@@ -51,6 +52,7 @@ public class Fragment_WItem extends Fragment {
         super.onCreate(savedInstanceState);
         //mWItem = new WItem();
         UUID itemId = (UUID) getArguments().getSerializable(ARG_WITEM_ID);
+        isNewItem = getArguments().getBoolean(ARG_ISNEWITEM_ID);
         //UUID itemId = (UUID) getActivity().getIntent().getSerializableExtra(ARG_WITEM_ID);
         //UUID itemId = (UUID) getActivity().getIntent().getSerializableExtra(Activity_WItem_Pager.EXTRA_WITEM_ID);
         mWItem = WItemLab.get(getActivity()).getWItem(itemId);
@@ -74,8 +76,8 @@ public class Fragment_WItem extends Fragment {
         spinnerArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spSeason.setAdapter(spinnerArrayAdapter);
         spSeason.setSelection(spinnerArrayAdapter.getPosition(mWItem.getSeason()));
-        seekMinT.setProgress(mWItem.getMinTemp());
-        seekMaxT.setProgress(mWItem.getMaxTemp());
+        seekMinT.setProgress(mWItem.getMinTemp()-seekDelta);
+        seekMaxT.setProgress(mWItem.getMaxTemp()-seekDelta);
 
         //btnAddDate.setText(mWItem.getAddDate().toString());
         btnAddDate.setEnabled(false);
@@ -146,13 +148,32 @@ public class Fragment_WItem extends Fragment {
 
         }
     };
-    public static Fragment_WItem newInstance(UUID wItemId, Context context) {
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+     //   if(mWItem.getTitle()!=null){
+     //       if(!mWItem.getTitle().isEmpty()){
+     //           if(isNewItem) {
+     //               WItemLab.get(getContext()).addWItem(mWItem);
+     //           }else {
+     //               WItemLab.get(getContext()).updateWItem(mWItem);
+     //           }
+     //       }
+     //   }
+        //WItemLab.get(getApplicationContext()).addWItem(item);
+     //   Log.e("FRAGMENT WITEM","DESTROY!!!");
+    }
+
+    public static Fragment_WItem newInstance(UUID wItemId, Context context,boolean isNewItem) {
 
         Bundle args = new Bundle();
         args.putSerializable(ARG_WITEM_ID,wItemId);
+        args.putBoolean(ARG_ISNEWITEM_ID,isNewItem);
+
         Fragment_WItem fragment = new Fragment_WItem();
         fragment.setArguments(args);
-        Log.e("FRAGMENT NEW INSTANCE ",""+WItemLab.get(context).getWItem(wItemId).getTitle()+"    "+wItemId);
+        //Log.e("FRAGMENT NEW INSTANCE ",""+WItemLab.get(context).getWItem(wItemId).getTitle()+"    "+wItemId);
         return fragment;
     }
 }

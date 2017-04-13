@@ -25,7 +25,10 @@ public class DbHelper extends SQLiteOpenHelper {
         db.execSQL("create table "+ WItemTable.TABLE_NAME+"("+
         WItemTable.Cols.ID+" integer primary key autoincrement, "+
         WItemTable.Cols.UUID+", "+
-        WItemTable.Cols.TITLE+
+        WItemTable.Cols.TITLE+", "+
+                WItemTable.Cols.SEASON+", "+
+                WItemTable.Cols.MIN_T+", "+
+                WItemTable.Cols.MAX_T+
         ")"
         );
     }

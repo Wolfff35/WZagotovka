@@ -12,6 +12,9 @@ public class DbSchema {
             public static final String ID = "_id";
             public static final String UUID = "uuid";
             public static final String TITLE = "title";
+            public static final String SEASON = "season";
+            public static final String MIN_T = "min_temp";
+            public static final String MAX_T = "max_temp";
 
         }
     }

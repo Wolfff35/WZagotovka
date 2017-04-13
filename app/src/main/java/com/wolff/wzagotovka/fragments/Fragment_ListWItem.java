@@ -119,7 +119,7 @@ public  class WItemHolder extends RecyclerView.ViewHolder implements View.OnClic
 
     @Override
     public void onClick(View v) {
-        Intent intent = Activity_WItem_Pager.newIntent(v.getContext(),mWItem.getId());
+        Intent intent = Activity_WItem_Pager.newIntent(v.getContext(),mWItem.getId(),false);
         startActivity(intent);
         Log.e("CLICK ITEM",""+mWItem.getTitle());
     }
