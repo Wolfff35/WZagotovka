@@ -1,0 +1,37 @@
+package com.wolff.wzagotovka.localdb;
+
+import android.content.Context;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
+
+import com.wolff.wzagotovka.localdb.DbSchema.WItemTable;
+
+/**
+ * Created by wolff on 11.04.2017.
+ */
+
+public class DbHelper extends SQLiteOpenHelper {
+    private static final int VERSION = 1;
+    private static final String DATABASE_NAME = "wItemBase.db";
+
+    public DbHelper(Context context) {
+        super(context, DATABASE_NAME, null, VERSION);
+    }
+
+    @Override
+    public void onCreate(SQLiteDatabase db) {
+        Log.e("SQLITE","CREATE");
+        db.execSQL("create table "+ WItemTable.TABLE_NAME+"("+
+        WItemTable.Cols.ID+" integer primary key autoincrement, "+
+        WItemTable.Cols.UUID+", "+
+        WItemTable.Cols.TITLE+
+        ")"
+        );
+    }
+
+    @Override
+    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+
+    }
+}

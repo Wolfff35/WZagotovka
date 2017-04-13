@@ -1,11 +1,14 @@
 package com.wolff.wzagotovka;
 
+import android.content.Intent;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.FragmentManager;
+import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -13,17 +16,25 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.Menu;
 import android.view.MenuItem;
 
+import com.wolff.wzagotovka.activities.Activity_WItem_Pager;
 import com.wolff.wzagotovka.fragments.Fragment_ListWItem;
+import com.wolff.wzagotovka.fragments.Fragment_logo;
 import com.wolff.wzagotovka.objects.WItem;
+import com.wolff.wzagotovka.objects.WItemLab;
+import com.wolff.wzagotovka.yahooWeather.WeatherInfo;
+import com.wolff.wzagotovka.yahooWeather.YahooWeather;
+import com.wolff.wzagotovka.yahooWeather.YahooWeatherInfoListener;
 
 
 public class ActivityMain extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
+        implements NavigationView.OnNavigationItemSelectedListener,YahooWeatherInfoListener {
+    YahooWeather mYahooWeather;
+    WeatherInfo mWeatherInfo;
     FloatingActionButton fab;
-    FragmentManager fragmentManager;
+
+    //FragmentManager fragmentManager;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -35,10 +46,17 @@ public class ActivityMain extends AppCompatActivity
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+                WItem item = new WItem();
+                WItemLab.get(getApplicationContext()).addWItem(item);
+                Intent intent = Activity_WItem_Pager.newIntent(getApplicationContext(),item.getId());
+                startActivity(intent);
+                //Log.e("CLICK ITEM",""+item.getTitle());
+                //Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+                //        .setAction("Action", null).show();
             }
         });
+        Fragment_logo fragment_logo = new Fragment_logo();
+        displayFragment(fragment_logo);
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -48,15 +66,20 @@ public class ActivityMain extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
-
-        //-----------------------------------------------------------------------------------------
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        Fragment fragment_list_witem = fragmentManager.findFragmentById(R.id.content_activity_main_container);
-        if(fragment_list_witem==null){
-            fragment_list_witem = new Fragment_ListWItem();
-            fragmentManager.beginTransaction().add(R.id.content_activity_main_container,fragment_list_witem).commit();
+//=================================================================================================
+        mYahooWeather = YahooWeather.getInstance(5000, true);
+        String _location = "Kiev";
+        if (!TextUtils.isEmpty(_location)) {
+            searchByPlaceName(_location);
         }
-
+        //-----------------------------------------------------------------------------------------
+        //FragmentManager fragmentManager = getSupportFragmentManager();
+        //Fragment fragment_list_witem = fragmentManager.findFragmentById(R.id.content_activity_main_container);
+        //if(fragment_list_witem==null){
+        Fragment_ListWItem fragment_list_witem = new Fragment_ListWItem();
+        //    fragmentManager.beginTransaction().add(R.id.content_activity_main_container,fragment_list_witem).commit();
+        //}
+        displayFragment(fragment_list_witem);
     }
 
     @Override
@@ -69,29 +92,7 @@ public class ActivityMain extends AppCompatActivity
         }
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.activity_main, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
-
-    @SuppressWarnings("StatementWithEmptyBody")
+     @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
@@ -118,16 +119,44 @@ public class ActivityMain extends AppCompatActivity
 
 
     ///=============================================================================================
- /*   private void displayFragment(Fragment fragment) {
+    private void displayFragment(Fragment fragment) {
         FragmentTransaction fragmentTransaction;
-        fragmentTransaction = getFragmentManager().beginTransaction();
+        fragmentTransaction = getSupportFragmentManager().beginTransaction();
         fragmentTransaction.replace(R.id.content_activity_main_container, fragment);
         fragmentTransaction.commit();
-        if (fragment.getClass().getSimpleName().equalsIgnoreCase("Fragment_catalog")) {
+        if (fragment.getClass().getSimpleName().equalsIgnoreCase("Fragment_ListWItem")) {
             fab.setVisibility(View.VISIBLE);
         } else {
             fab.setVisibility(View.INVISIBLE);
         }
     }
-*/
+
+    @Override
+    public void gotWeatherInfo(WeatherInfo weatherInfo, YahooWeather.ErrorType errorType) {
+        if (weatherInfo != null) {
+            if (mYahooWeather.getSearchMode() == YahooWeather.SEARCH_MODE.GPS) {
+                if (weatherInfo.getAddress() != null) {
+                }
+            }
+            mWeatherInfo = weatherInfo;
+            Log.e("== CURRENT","====== CURRENT ======" + "\n" +
+                    "date: " + weatherInfo.getCurrentConditionDate() + "\n" +
+                    "weather: " + weatherInfo.getCurrentText() + "\n" +
+                    "temperature in ºC: " + weatherInfo.getCurrentTemp() + "\n" +
+                    "wind chill: " + weatherInfo.getWindChill() + "\n" +
+                    "wind direction: " + weatherInfo.getWindDirection() + "\n" +
+                    "wind speed: " + weatherInfo.getWindSpeed() + "\n" +
+                    "Humidity: " + weatherInfo.getAtmosphereHumidity() + "\n" +
+                    "Pressure: " + weatherInfo.getAtmospherePressure() + "\n" +
+                    "Visibility: " + weatherInfo.getAtmosphereVisibility());
+
+        }
     }
+    private void searchByPlaceName(String location) {
+        mYahooWeather.setNeedDownloadIcons(true);
+        mYahooWeather.setUnit(YahooWeather.UNIT.CELSIUS);
+        mYahooWeather.setSearchMode(YahooWeather.SEARCH_MODE.PLACE_NAME);
+        mYahooWeather.queryYahooWeatherByPlaceName(getApplicationContext(), location, ActivityMain.this);
+    }
+
+}

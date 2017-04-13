@@ -14,7 +14,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.wolff.wzagotovka.R;
-import com.wolff.wzagotovka.activities.Activity_WItem;
+import com.wolff.wzagotovka.activities.Activity_WItem_Pager;
 import com.wolff.wzagotovka.objects.WItem;
 import com.wolff.wzagotovka.objects.WItemLab;
 
@@ -57,6 +57,7 @@ public class Fragment_ListWItem extends Fragment {
             mItemAdapter = new WItemAdapter(items);
             rvWItemList.setAdapter(mItemAdapter);
         } else {
+            mItemAdapter.setWItems(items);
             mItemAdapter.notifyDataSetChanged();
         }
         Log.e("UpdateUI","--------------------------------------------------------------------------");
@@ -90,33 +91,37 @@ public class WItemAdapter extends RecyclerView.Adapter<WItemHolder>{
         return mWItemList.size();
     }
 
+    public void setWItems(List<WItem> items){
+        mWItemList = items;
+    }
 
 
 }
     //==================================================================================================
 public  class WItemHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
     private WItem mWItem;
-    private TextView mNameItem;
-    private TextView mIdItem;
+    private TextView mTitleItem;
+    private TextView mMinTempItem;
+    private TextView mMaxTempItem;
 
     public WItemHolder(View itemView) {
         super(itemView);
         itemView.setOnClickListener(this);
         ///-mNameItem = (TextView) itemView;
-        mNameItem = (TextView) itemView.findViewById(R.id.tvName_listItem);
-        mIdItem = (TextView) itemView.findViewById(R.id.tvId_listItem);
+        mTitleItem = (TextView) itemView.findViewById(R.id.tvTitle_listItem);
+       // mIdItem = (TextView) itemView.findViewById(R.id.tvId_listItem);
     }
     public void bindWItem(WItem item){
         mWItem = item;
-        mIdItem.setText(mWItem.getId().toString());
-        mNameItem.setText(mWItem.getName());
+        //mIdItem.setText(mWItem.getId().toString());
+        mTitleItem.setText(mWItem.getTitle());
     }
 
     @Override
     public void onClick(View v) {
-        Intent intent = Activity_WItem.newIntent(v.getContext(),mWItem.getId()); //new Intent(v.getContext(),Activity_WItem.class);
+        Intent intent = Activity_WItem_Pager.newIntent(v.getContext(),mWItem.getId());
         startActivity(intent);
-        Log.e("CLICK ITEM",""+mWItem.getName());
+        Log.e("CLICK ITEM",""+mWItem.getTitle());
     }
 }//==================================================================================================
 }

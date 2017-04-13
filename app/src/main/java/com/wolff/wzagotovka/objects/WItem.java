@@ -1,5 +1,6 @@
 package com.wolff.wzagotovka.objects;
 
+import java.util.Date;
 import java.util.UUID;
 
 /**
@@ -8,21 +9,60 @@ import java.util.UUID;
 
 public class WItem {
     private UUID mId;
-    private String mName;
-
+    private String mTitle;
+    private String mSeason;
+    private int mMinTemp;
+    private int mMaxTemp;
+    private Date mAddDate;//дата добавления
+    public WItem(UUID id){
+        mId = id;
+    }
     public WItem(){
         mId = UUID.randomUUID();
+        mAddDate = new Date();
     }
 
     public UUID getId() {
         return mId;
     }
 
-    public String getName() {
-        return mName;
+    public String getTitle() {
+        return mTitle;
     }
 
-    public void setName(String name) {
-        mName = name;
+    public void setTitle(String title) {
+        mTitle = title;
+    }
+
+    public String getSeason() {
+        return mSeason;
+    }
+
+    public void setSeason(String season) {
+        mSeason = season;
+    }
+
+    public int getMinTemp() {
+        return mMinTemp;
+    }
+
+    public void setMinTemp(int minTemp) {
+        this.mMinTemp = minTemp;
+    }
+
+    public int getMaxTemp() {
+        return mMaxTemp;
+    }
+
+    public void setMaxTemp(int maxTemp) {
+        this.mMaxTemp = maxTemp;
+    }
+
+    public Date getAddDate() {
+        return mAddDate;
+    }
+
+    public void setAddDate(Date addDate) {
+        mAddDate = addDate;
     }
 }
