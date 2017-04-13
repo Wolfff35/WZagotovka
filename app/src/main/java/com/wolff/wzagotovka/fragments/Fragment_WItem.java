@@ -182,6 +182,7 @@ public class Fragment_WItem extends Fragment {
                                WItemLab.get(getContext()).addWItem(mWItem);
                            }else {
                                WItemLab.get(getContext()).updateWItem(mWItem);
+
                            }
                        }
                    }
