@@ -8,6 +8,9 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -50,7 +53,7 @@ public class Fragment_WItem extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        //mWItem = new WItem();
+        setHasOptionsMenu(true);
         UUID itemId = (UUID) getArguments().getSerializable(ARG_WITEM_ID);
         isNewItem = getArguments().getBoolean(ARG_ISNEWITEM_ID);
         //UUID itemId = (UUID) getActivity().getIntent().getSerializableExtra(ARG_WITEM_ID);
@@ -163,6 +166,29 @@ public class Fragment_WItem extends Fragment {
      //   }
         //WItemLab.get(getApplicationContext()).addWItem(item);
      //   Log.e("FRAGMENT WITEM","DESTROY!!!");
+    }
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.fragment_witem, menu);
+    }
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.menu_witem_save:
+                   if(mWItem.getTitle()!=null){
+                       if(!mWItem.getTitle().isEmpty()){
+                           if(isNewItem) {
+                               WItemLab.get(getContext()).addWItem(mWItem);
+                           }else {
+                               WItemLab.get(getContext()).updateWItem(mWItem);
+                           }
+                       }
+                   }
+                 return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 
     public static Fragment_WItem newInstance(UUID wItemId, Context context,boolean isNewItem) {
