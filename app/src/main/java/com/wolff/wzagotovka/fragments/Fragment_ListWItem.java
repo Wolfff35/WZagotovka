@@ -55,11 +55,13 @@ public class Fragment_ListWItem extends Fragment {
         List<WItem> items = itemLab.getWItems();
         if(mItemAdapter==null) {
             mItemAdapter = new WItemAdapter(items);
-            rvWItemList.setAdapter(mItemAdapter);
-        } else {
-            mItemAdapter.setWItems(items);
-            mItemAdapter.notifyDataSetChanged();
         }
+            //    rvWItemList.setAdapter(mItemAdapter);
+        //} else {
+            mItemAdapter.setWItems(items);
+            rvWItemList.setAdapter(mItemAdapter);
+            // mItemAdapter.notifyDataSetChanged();
+        //}
         Log.e("UpdateUI","--------------------------------------------------------------------------");
 
     }
@@ -121,7 +123,7 @@ public  class WItemHolder extends RecyclerView.ViewHolder implements View.OnClic
     public void onClick(View v) {
         Intent intent = Activity_WItem_Pager.newIntent(v.getContext(),mWItem.getId(),false);
         startActivity(intent);
-        Log.e("CLICK ITEM",""+mWItem.getTitle());
+        Log.e("CLICK ITEM",""+mWItem.getTitle()+" = "+mWItem.getId());
     }
 }//==================================================================================================
 }

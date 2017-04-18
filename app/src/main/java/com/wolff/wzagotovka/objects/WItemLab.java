@@ -103,7 +103,7 @@ public class WItemLab {
     public void updateWItem(WItem item){
         ContentValues values = getContentValues(item);
         mDatabase.update(WItemTable.TABLE_NAME,values,WItemTable.Cols.UUID+" = ?",new String[]{item.getId().toString()});
-        Log.e("DB UPDATE","UPDATE");
+        Log.e("DB UPDATE","UPDATE"+item.getId()+" = = = "+item.getTitle());
     }
     private DbCursorWrapper queryWItem(String whereClause,
                                               String[] whereArgs) {
@@ -116,6 +116,7 @@ public class WItemLab {
                 null, // having
                 null // orderBy
                  );
+        Log.e("WITEMLAB","cutsor = "+cursor.getCount());
         return new DbCursorWrapper(cursor);
     }
 

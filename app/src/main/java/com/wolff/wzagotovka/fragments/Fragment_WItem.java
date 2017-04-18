@@ -47,7 +47,7 @@ public class Fragment_WItem extends Fragment {
     @Override
     public void onPause() {
         super.onPause();
-        WItemLab.get(getActivity()).updateWItem(mWItem);
+        ////WItemLab.get(getActivity()).updateWItem(mWItem);
     }
 
     @Override
@@ -176,7 +176,14 @@ public class Fragment_WItem extends Fragment {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menu_witem_save:
-                   if(mWItem.getTitle()!=null){
+                mWItem.setTitle(edTitle.getText().toString());
+                mWItem.setMinTemp(seekMinT.getProgress()-seekDelta);
+                mWItem.setMaxTemp(seekMaxT.getProgress()-seekDelta);
+                //mWItem.setSeason(spSeason.getSelectedItem());
+                String[]choose = getResources().getStringArray(R.array.WSeasons);
+                mWItem.setSeason(choose[spSeason.getSelectedItemPosition()]);
+                Log.e("SPINNER"," = "+mWItem.getSeason());
+                if(mWItem.getTitle()!=null){
                        if(!mWItem.getTitle().isEmpty()){
                            if(isNewItem) {
                                WItemLab.get(getContext()).addWItem(mWItem);
@@ -186,6 +193,7 @@ public class Fragment_WItem extends Fragment {
                            }
                        }
                    }
+                getActivity().finish();
                  return true;
             default:
                 return super.onOptionsItemSelected(item);

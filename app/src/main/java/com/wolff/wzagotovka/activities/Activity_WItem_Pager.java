@@ -19,7 +19,7 @@ import com.wolff.wzagotovka.objects.WItemLab;
 import java.util.List;
 import java.util.UUID;
 
-public class Activity_WItem_Pager extends FragmentActivity {
+public class Activity_WItem_Pager extends AppCompatActivity {
     private ViewPager mViewPager;
     private List<WItem> mWItems;
     public static final String EXTRA_WITEM_ID = "witem_id";
