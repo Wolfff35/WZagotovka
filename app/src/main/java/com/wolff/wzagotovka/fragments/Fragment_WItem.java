@@ -59,7 +59,7 @@ public class Fragment_WItem extends Fragment {
         //UUID itemId = (UUID) getActivity().getIntent().getSerializableExtra(ARG_WITEM_ID);
         //UUID itemId = (UUID) getActivity().getIntent().getSerializableExtra(Activity_WItem_Pager.EXTRA_WITEM_ID);
         mWItem = WItemLab.get(getActivity()).getWItem(itemId);
-        //Log.e("FRAGMENT ON CREATE","Fragment_WItem "+mWItem.getTitle()+" = "+itemId);
+        Log.e("FRAGMENT ON CREATE","Fragment_WItem "+mWItem.getTitle()+" = "+itemId);
     }
 
     @Nullable
@@ -193,18 +193,18 @@ public class Fragment_WItem extends Fragment {
                            }
                        }
                    }
-                getActivity().finish();
+                //getActivity().finish();
                  return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
     }
 
-    public static Fragment_WItem newInstance(UUID wItemId, Context context,boolean isNewItem) {
+    public static Fragment_WItem newInstance(UUID wItemId, Context context) {
 
         Bundle args = new Bundle();
         args.putSerializable(ARG_WITEM_ID,wItemId);
-        args.putBoolean(ARG_ISNEWITEM_ID,isNewItem);
+       // args.putBoolean(ARG_ISNEWITEM_ID,isNewItem);
 
         Fragment_WItem fragment = new Fragment_WItem();
         fragment.setArguments(args);
