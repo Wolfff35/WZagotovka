@@ -4,6 +4,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.os.Environment;
 import android.util.Log;
 
 import com.wolff.wzagotovka.localdb.DbCursorWrapper;
@@ -11,6 +12,7 @@ import com.wolff.wzagotovka.localdb.DbHelper;
 import com.wolff.wzagotovka.localdb.DbSchema;
 import com.wolff.wzagotovka.localdb.DbSchema.WItemTable;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -26,7 +28,6 @@ public class WItemLab {
 
     private Context mContext;
     private SQLiteDatabase mDatabase;
-
     private WItemLab(Context context){
         mContext = context.getApplicationContext();
         mDatabase = new DbHelper(mContext).getWritableDatabase();
@@ -105,6 +106,9 @@ public class WItemLab {
         mDatabase.update(WItemTable.TABLE_NAME,values,WItemTable.Cols.UUID+" = ?",new String[]{item.getId().toString()});
         Log.e("DB UPDATE","UPDATE"+item.getId()+" = = = "+item.getTitle());
     }
+    public void deleteWItem(WItem item){
+        mDatabase.delete(WItemTable.TABLE_NAME,WItemTable.Cols.UUID+" = ?",new String[]{item.getId().toString()});
+    }
     private DbCursorWrapper queryWItem(String whereClause,
                                               String[] whereArgs) {
         Cursor cursor = mDatabase.query(
@@ -119,5 +123,11 @@ public class WItemLab {
         Log.e("WITEMLAB","cutsor = "+cursor.getCount());
         return new DbCursorWrapper(cursor);
     }
-
+    public File getPhotoFile(WItem item){
+        File externalFilesDir = mContext.getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+        if(externalFilesDir==null){
+            return null;
+        }
+        return new File(externalFilesDir,item.getPhotoFileName());
+    }
 }

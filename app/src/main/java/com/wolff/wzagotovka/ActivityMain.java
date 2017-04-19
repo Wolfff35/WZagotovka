@@ -34,7 +34,7 @@ public class ActivityMain extends AppCompatActivity
     YahooWeather mYahooWeather;
     WeatherInfo mWeatherInfo;
     FloatingActionButton fab;
-
+    Fragment_ListWItem fragment_list_witem;
     //FragmentManager fragmentManager;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,7 +77,7 @@ public class ActivityMain extends AppCompatActivity
         //FragmentManager fragmentManager = getSupportFragmentManager();
         //Fragment fragment_list_witem = fragmentManager.findFragmentById(R.id.content_activity_main_container);
         //if(fragment_list_witem==null){
-        Fragment_ListWItem fragment_list_witem = new Fragment_ListWItem();
+        fragment_list_witem = new Fragment_ListWItem();
         //    fragmentManager.beginTransaction().add(R.id.content_activity_main_container,fragment_list_witem).commit();
         //}
         displayFragment(fragment_list_witem);
@@ -99,17 +99,11 @@ public class ActivityMain extends AppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        if (id == R.id.nav_camera) {
-            // Handle the camera action
-        } else if (id == R.id.nav_gallery) {
+        if (id == R.id.nav_catalog) {
+            displayFragment(fragment_list_witem);
+        } else if (id == R.id.nav_select) {
 
-        } else if (id == R.id.nav_slideshow) {
-
-        } else if (id == R.id.nav_manage) {
-
-        } else if (id == R.id.nav_share) {
-
-        } else if (id == R.id.nav_send) {
+        } else if (id == R.id.nav_settings) {
 
         }
 

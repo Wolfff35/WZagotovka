@@ -1,7 +1,11 @@
 package com.wolff.wzagotovka.fragments;
 
 import android.content.Context;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.text.Editable;
@@ -26,6 +30,7 @@ import com.wolff.wzagotovka.activities.Activity_WItem_Pager;
 import com.wolff.wzagotovka.objects.WItem;
 import com.wolff.wzagotovka.objects.WItemLab;
 
+import java.io.File;
 import java.util.UUID;
 
 /**
@@ -42,8 +47,10 @@ public class Fragment_WItem extends Fragment {
     private ImageView imPhoto;
     private static final String ARG_WITEM_ID = "WItem_ID";
     private static final String ARG_ISNEWITEM_ID = "isNewItem";
+    private static final int REQUEST_PHOTO= 2;
     private int seekDelta = 5;
     private  boolean isNewItem;
+    private File mPhotoFile;
     @Override
     public void onPause() {
         super.onPause();
@@ -65,6 +72,11 @@ public class Fragment_WItem extends Fragment {
             isNewItem=true;
             mWItem = new WItem();
         }
+        mPhotoFile = WItemLab.get(getActivity()).getPhotoFile(mWItem);
+
+
+
+
         Log.e("FRAGMENT ON CREATE","Fragment_WItem "+mWItem.getTitle()+" = "+itemId);
     }
 
@@ -80,6 +92,15 @@ public class Fragment_WItem extends Fragment {
         btnAddDate = (Button) v.findViewById(R.id.btnAddDate);
         imPhoto = (ImageView) v.findViewById(R.id.imPhoto);
 
+        final Intent captureImage = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        PackageManager packageManager = getActivity().getPackageManager();
+        boolean canTakePhoto = mPhotoFile!=null&&captureImage.resolveActivity(packageManager)!=null;
+        imPhoto.setEnabled(canTakePhoto);
+        if(canTakePhoto){
+            Uri uri = Uri.fromFile(mPhotoFile);
+            captureImage.putExtra(MediaStore.EXTRA_OUTPUT,uri);
+
+        }
         edTitle.setText(mWItem.getTitle());
         ArrayAdapter<String> spinnerArrayAdapter = new ArrayAdapter<String>(getContext(),android.R.layout.simple_spinner_item,getResources().getStringArray(R.array.WSeasons));
         spinnerArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -122,6 +143,12 @@ public class Fragment_WItem extends Fragment {
         });
         seekMinT.setOnSeekBarChangeListener(mOnSeekBarChangeListener);
         seekMaxT.setOnSeekBarChangeListener(mOnSeekBarChangeListener);
+        imPhoto.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivityForResult(captureImage,REQUEST_PHOTO);
+            }
+        });
         return v;
     }
 
@@ -202,6 +229,10 @@ public class Fragment_WItem extends Fragment {
                    }
                 getActivity().finish();
                  return true;
+            case R.id.menu_witem_delete:
+                WItemLab.get(getContext()).deleteWItem(mWItem);
+                getActivity().finish();
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }

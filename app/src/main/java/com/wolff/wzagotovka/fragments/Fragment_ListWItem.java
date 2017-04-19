@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -32,12 +33,13 @@ public class Fragment_ListWItem extends Fragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        //return super.onCreateView(inflater, container, savedInstanceState);
         View view = inflater.inflate(R.layout.fragment_list_witem,container,false);
         rvWItemList = (RecyclerView)view.findViewById(R.id.rvWItemList);
+        rvWItemList.addItemDecoration(new DividerItemDecoration(getActivity(), DividerItemDecoration.VERTICAL));
+        rvWItemList.setHasFixedSize(true);
         rvWItemList.setLayoutManager(new LinearLayoutManager(getActivity()));
         updateUI();
-        return view;
+       return view;
     }
 
     @Override
@@ -84,7 +86,6 @@ public class WItemAdapter extends RecyclerView.Adapter<WItemHolder>{
     @Override
     public void onBindViewHolder(WItemHolder holder, int position) {
         WItem item = mWItemList.get(position);
-        //holder.mNameItem.setText(item.getName());
         holder.bindWItem(item);
     }
 
@@ -103,8 +104,8 @@ public class WItemAdapter extends RecyclerView.Adapter<WItemHolder>{
 public  class WItemHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
     private WItem mWItem;
     private TextView mTitleItem;
-    private TextView mMinTempItem;
-    private TextView mMaxTempItem;
+    //private TextView mMinTempItem;
+    //private TextView mMaxTempItem;
 
     public WItemHolder(View itemView) {
         super(itemView);
@@ -116,7 +117,7 @@ public  class WItemHolder extends RecyclerView.ViewHolder implements View.OnClic
     public void bindWItem(WItem item){
         mWItem = item;
         //mIdItem.setText(mWItem.getId().toString());
-        mTitleItem.setText(mWItem.getTitle());
+        mTitleItem.setText(mWItem.getTitle()+"(сезон - "+mWItem.getSeason()+"), min: "+mWItem.getMinTemp()+" - max: "+mWItem.getMaxTemp());
     }
 
     @Override

@@ -65,4 +65,8 @@ public class WItem {
     public void setAddDate(Date addDate) {
         mAddDate = addDate;
     }
+
+    public String getPhotoFileName(){
+        return "IMG_"+getId().toString()+".jpg";
+    }
 }
