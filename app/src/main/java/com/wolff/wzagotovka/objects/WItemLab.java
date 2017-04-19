@@ -55,7 +55,7 @@ public class WItemLab {
                 mWItemList.add(cursor.getWItem());
                 cursor.moveToNext();
             }
-
+            Log.e("WItemLab.getWItems","cursor coumt = "+cursor.getCount());
         }
         finally {
             Log.e("DATABASE","cursor = "+cursor.getCount());

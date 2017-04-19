@@ -18,6 +18,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 
+import com.wolff.wzagotovka.activities.Activity_NewWItem;
 import com.wolff.wzagotovka.activities.Activity_WItem_Pager;
 import com.wolff.wzagotovka.fragments.Fragment_ListWItem;
 import com.wolff.wzagotovka.fragments.Fragment_logo;
@@ -48,7 +49,7 @@ public class ActivityMain extends AppCompatActivity
             public void onClick(View view) {
                 WItem item = new WItem();
                 //WItemLab.get(getApplicationContext()).addWItem(item);
-                Intent intent = Activity_WItem_Pager.newIntent(getApplicationContext(),item.getId());
+                Intent intent = Activity_NewWItem.newIntent(getApplicationContext());
                 startActivity(intent);
                 //Log.e("CLICK ITEM",""+item.getTitle());
                 //Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
