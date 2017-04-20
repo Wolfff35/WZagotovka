@@ -1,13 +1,22 @@
 package com.wolff.wzagotovka.fragments;
 
+import android.app.Activity;
+import android.content.ClipData;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
+import android.graphics.Bitmap;
+import android.graphics.Point;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.annotation.Nullable;
+import android.support.v4.BuildConfig;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
+import android.support.v4.content.FileProvider;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -29,8 +38,10 @@ import com.wolff.wzagotovka.R;
 import com.wolff.wzagotovka.activities.Activity_WItem_Pager;
 import com.wolff.wzagotovka.objects.WItem;
 import com.wolff.wzagotovka.objects.WItemLab;
+import com.wolff.wzagotovka.utils.PictureUtils;
 
 import java.io.File;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -51,7 +62,20 @@ public class Fragment_WItem extends Fragment {
     private int seekDelta = 5;
     private  boolean isNewItem;
     private File mPhotoFile;
-    @Override
+    //private static final String AUTHORITY=BuildConfig.APPLICATION_ID+".provider";
+
+    public static Fragment_WItem newInstance(UUID wItemId, Context context) {
+
+        Bundle args = new Bundle();
+        args.putSerializable(ARG_WITEM_ID,wItemId);
+        //args.putBoolean(ARG_ISNEWITEM_ID,isNewItem);
+
+        Fragment_WItem fragment = new Fragment_WItem();
+        fragment.setArguments(args);
+        //Log.e("FRAGMENT NEW INSTANCE ",""+WItemLab.get(context).getWItem(wItemId).getTitle()+"    "+wItemId);
+        return fragment;
+    }
+     @Override
     public void onPause() {
         super.onPause();
         ////WItemLab.get(getActivity()).updateWItem(mWItem);
@@ -61,10 +85,9 @@ public class Fragment_WItem extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
- //       String arg = (String) getArguments().getSerializable(ARG_WITEM_ID);
         UUID itemId = (UUID) getArguments().getSerializable(ARG_WITEM_ID);
 
-        Log.e("ARG_WITEM_ID"," = "+itemId);
+        //Log.e("ARG_WITEM_ID"," = "+itemId);
         if(itemId!=null) {
             isNewItem=false;
             mWItem = WItemLab.get(getActivity()).getWItem(itemId);
@@ -77,13 +100,13 @@ public class Fragment_WItem extends Fragment {
 
 
 
-        Log.e("FRAGMENT ON CREATE","Fragment_WItem "+mWItem.getTitle()+" = "+itemId);
+        //Log.e("FRAGMENT ON CREATE","Fragment_WItem "+mWItem.getTitle()+" = "+itemId);
     }
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        //return super.onCreateView(inflater, container, savedInstanceState);
+
         View v = inflater.inflate(R.layout.activity_witem,container,false);
         edTitle = (EditText) v.findViewById(R.id.edTitle);
         spSeason = (Spinner) v.findViewById(R.id.spSeason);
@@ -97,9 +120,38 @@ public class Fragment_WItem extends Fragment {
         boolean canTakePhoto = mPhotoFile!=null&&captureImage.resolveActivity(packageManager)!=null;
         imPhoto.setEnabled(canTakePhoto);
         if(canTakePhoto){
-            Uri uri = Uri.fromFile(mPhotoFile);
-            captureImage.putExtra(MediaStore.EXTRA_OUTPUT,uri);
+            //Log.e("++++++++++++++++++++++","APP ID = "+com.wolff.wzagotovka.BuildConfig.APPLICATION_ID);
+            final String AUTHORITY=getActivity().getPackageName()+".share";
+            //Log.e("URI===","=======================================================================");
+            //Log.e("URI===","AUTHORITY = "+AUTHORITY);
+            //Log.e("URI===","mPhotoFile = "+mPhotoFile);
+            //Log.e("URI===","=======================================================================");
 
+            Uri outputUri= FileProvider.getUriForFile(getContext(), AUTHORITY, mPhotoFile);
+
+            captureImage.putExtra(MediaStore.EXTRA_OUTPUT, outputUri);
+
+            if (Build.VERSION.SDK_INT>=Build.VERSION_CODES.LOLLIPOP) {
+                captureImage.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+            }
+            else if (Build.VERSION.SDK_INT>=Build.VERSION_CODES.JELLY_BEAN) {
+                ClipData clip=
+                        ClipData.newUri(getActivity().getContentResolver(), "A photo", outputUri);
+
+                captureImage.setClipData(clip);
+                captureImage.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+            }
+            else {
+                List<ResolveInfo> resInfoList=
+                        getActivity().getPackageManager()
+                                .queryIntentActivities(captureImage, PackageManager.MATCH_DEFAULT_ONLY);
+
+                for (ResolveInfo resolveInfo : resInfoList) {
+                    String packageName = resolveInfo.activityInfo.packageName;
+                    getActivity().grantUriPermission(packageName, outputUri,
+                            Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+                }
+            }
         }
         edTitle.setText(mWItem.getTitle());
         ArrayAdapter<String> spinnerArrayAdapter = new ArrayAdapter<String>(getContext(),android.R.layout.simple_spinner_item,getResources().getStringArray(R.array.WSeasons));
@@ -146,10 +198,27 @@ public class Fragment_WItem extends Fragment {
         imPhoto.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivityForResult(captureImage,REQUEST_PHOTO);
+                if( ContextCompat.checkSelfPermission(getContext(), android.Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                        requestPermissions(new String[]{android.Manifest.permission.CAMERA},
+                                5);
+                    }
+                }
+               startActivityForResult(captureImage,REQUEST_PHOTO);
             }
         });
+        updatePhotoView();
         return v;
+    }
+
+    @Override
+    public void onActivityResult(int requestCode,int resultCode,Intent data){
+        if(resultCode!= Activity.RESULT_OK){
+            return;
+        }
+        if(requestCode==REQUEST_PHOTO){
+            updatePhotoView();
+        }
     }
 
     SeekBar.OnSeekBarChangeListener mOnSeekBarChangeListener = new SeekBar.OnSeekBarChangeListener() {
@@ -188,18 +257,7 @@ public class Fragment_WItem extends Fragment {
     @Override
     public void onDestroy() {
         super.onDestroy();
-     //   if(mWItem.getTitle()!=null){
-     //       if(!mWItem.getTitle().isEmpty()){
-     //           if(isNewItem) {
-     //               WItemLab.get(getContext()).addWItem(mWItem);
-     //           }else {
-     //               WItemLab.get(getContext()).updateWItem(mWItem);
-     //           }
-     //       }
-     //   }
-        //WItemLab.get(getApplicationContext()).addWItem(item);
-     //   Log.e("FRAGMENT WITEM","DESTROY!!!");
-    }
+     }
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
@@ -238,15 +296,21 @@ public class Fragment_WItem extends Fragment {
         }
     }
 
-    public static Fragment_WItem newInstance(UUID wItemId, Context context) {
-
-        Bundle args = new Bundle();
-        args.putSerializable(ARG_WITEM_ID,wItemId);
-        //args.putBoolean(ARG_ISNEWITEM_ID,isNewItem);
-
-        Fragment_WItem fragment = new Fragment_WItem();
-        fragment.setArguments(args);
-        //Log.e("FRAGMENT NEW INSTANCE ",""+WItemLab.get(context).getWItem(wItemId).getTitle()+"    "+wItemId);
-        return fragment;
+    private void updatePhotoView() {
+        if (mPhotoFile == null || !mPhotoFile.exists()) {
+            imPhoto.setImageDrawable(null);
+        } else {
+        int mWidth = imPhoto.getWidth();
+        int mHeight = imPhoto.getHeight();
+        if(mWidth==0|mHeight==0){
+            Point size = new Point();
+            getActivity().getWindowManager().getDefaultDisplay().getSize(size);
+            mHeight = size.y;
+            mWidth = size.x;
+        }
+            Bitmap bitmap = PictureUtils.getScaledBitmap(
+                    mPhotoFile.getPath(),mWidth,mHeight);
+            imPhoto.setImageBitmap(bitmap);
+        }
     }
 }
